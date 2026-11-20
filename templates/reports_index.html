@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block title %}Reports{% endblock %}
+{% block content %}
+<div class="page-head"><div><h3>Reports</h3><div class="sub">Live reports straight from your records</div></div></div>
+<div class="row g-3 quick">
+{% for slug, title in items %}<div class="col-md-6 col-xl-4"><a href="{% url 'reports:report' slug %}"><i class="bi bi-file-earmark-bar-graph"></i><span>{{ title }}</span><i class="bi bi-arrow-right ms-auto" style="color:var(--faint)"></i></a></div>{% endfor %}
+</div>{% endblock %}

@@ -1,0 +1,41 @@
+from django.urls import path
+
+from . import views as v
+
+app_name = "production"
+urlpatterns = [
+    path("batches/", v.batches, name="batches"),
+    path("batches/new/", v.batch_create, name="batch_create"),
+    path("batches/<int:pk>/", v.batch_detail, name="batch_detail"),
+    path("batches/<int:pk>/edit/", v.batch_edit, name="batch_edit"),
+    path("batches/<int:pk>/delete/", v.batch_delete, name="batch_delete"),
+    path("batches/<int:pk>/cancel/", v.batch_cancel, name="batch_cancel"),
+    path("batches/<int:pk>/complete/", v.batch_complete, name="batch_complete"),
+    path("entries/", v.entries, name="entries"),
+    path("entries/new/", v.entry_new, name="entry_new"),
+    path("entries/manual/", v.manual_entry_new, name="entry_manual"),
+    path("entries/<int:pk>/delete/", v.entry_delete, name="entry_delete"),
+    path("inspection/", v.inspection_new, name="inspection"),
+    path("issue/", v.issue_material, name="issue"),
+    path("fg-receipt/", v.fg_receive, name="fg_receive"),
+    path("workers/", v.workers, name="workers"),
+    path("workers/new/", v.worker_new, name="worker_new"),
+    path("workers/<int:pk>/edit/", v.worker_edit, name="worker_edit"),
+    path("workers/<int:pk>/toggle/", v.worker_toggle, name="worker_toggle"),
+    path("workers/<int:pk>/delete/", v.worker_delete, name="worker_delete"),
+    path("operations/", v.operations, name="operations"),
+    path("operations/new/", v.operation_new, name="operation_new"),
+    path("operations/<int:pk>/edit/", v.operation_edit, name="operation_edit"),
+    path("operations/<int:pk>/toggle/", v.operation_toggle, name="operation_toggle"),
+    path("operations/<int:pk>/delete/", v.operation_delete, name="operation_delete"),
+    path("workflows/", v.workflows, name="workflows"),
+    path("workflows/new/", v.workflow_new, name="workflow_new"),
+    path("workflows/<int:pk>/edit/", v.workflow_edit, name="workflow_edit"),
+    path("workflows/<int:pk>/delete/", v.workflow_delete, name="workflow_delete"),
+    path("stages/", v.stages, name="stages"),
+    path("stages/new/", v.stage_new, name="stage_new"),
+    path("stages/<int:pk>/edit/", v.stage_edit, name="stage_edit"),
+    path("stages/<int:pk>/delete/", v.stage_delete, name="stage_delete"),
+    path("rates/", v.rates, name="rates"),
+    path("rates/new/", v.rate_new, name="rate_new"),
+]

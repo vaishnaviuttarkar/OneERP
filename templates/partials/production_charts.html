@@ -1,0 +1,29 @@
+{# Chart.js for the production insights partial (expects json_script "chart-data"). #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+  if(!window.Chart) return;
+  const data = JSON.parse(document.getElementById('chart-data').textContent);
+  const palette = ['#3f2d6b','#f0508f','#8f74d9','#f4a6c6','#b9aedb','#e03a7c','#5b4a8a'];
+  const statusColors = {'Planned':'#b9aedb','In Progress':'#8f74d9','Completed':'#3f2d6b','Cancelled':'#f4a6c6'};
+  let charts = [];
+  function draw(){
+    const s = getComputedStyle(document.documentElement), ink = s.getPropertyValue('--muted').trim(), card = s.getPropertyValue('--card').trim();
+    charts.forEach(c => c.destroy()); charts = [];
+    Chart.defaults.font.family = "'Inter',sans-serif"; Chart.defaults.color = ink;
+    const legend = {position:'bottom', labels:{usePointStyle:true, boxWidth:8, padding:12}};
+    const el = id => document.getElementById(id);
+    if (el('statusChart')) charts.push(new Chart(el('statusChart'), {type:'doughnut', data:{labels:data.status.labels, datasets:[{data:data.status.values,
+      backgroundColor:data.status.labels.map(l => statusColors[l] || '#ccc'), borderColor:card, borderWidth:3, hoverOffset:6}]},
+      options:{maintainAspectRatio:false, cutout:'66%', plugins:{legend:legend, tooltip:{callbacks:{label:x => ' ' + x.label + ': ' + x.parsed + ' batch' + (x.parsed === 1 ? '' : 'es')}}}}}));
+    if (el('stageChart')) charts.push(new Chart(el('stageChart'), {type:'bar', data:{labels:data.stages.labels, datasets:[{label:'Batches', data:data.stages.values,
+      backgroundColor:'#f0508f', borderRadius:8, maxBarThickness:22}]},
+      options:{indexAxis:'y', maintainAspectRatio:false, plugins:{legend:{display:false}},
+        scales:{x:{beginAtZero:true, ticks:{precision:0}, grid:{color:'rgba(127,127,160,.15)'}, border:{display:false}}, y:{grid:{display:false}}}}}));
+    if (el('clientChart')) charts.push(new Chart(el('clientChart'), {type:'pie', data:{labels:data.clients.labels, datasets:[{data:data.clients.values,
+      backgroundColor:palette, borderColor:card, borderWidth:3, hoverOffset:6}]},
+      options:{maintainAspectRatio:false, plugins:{legend:legend, tooltip:{callbacks:{label:x => ' ' + x.label + ': ' + Number(x.parsed).toLocaleString('en-IN') + ' pcs'}}}}}));
+  }
+  draw(); window.addEventListener('themechange', draw);
+})();
+</script>

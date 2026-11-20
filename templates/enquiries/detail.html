@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ e.reference }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h3 class="d-flex align-items-center gap-2 flex-wrap">{{ e.reference }} <span class="badge text-bg-{{ tone }}">{{ e.get_status_display }}</span></h3>
+    <div class="sub">{{ e.subject }}</div></div>
+  <div class="head-actions"><a class="btn btn-sm btn-outline-secondary" href="{% url 'enquiries:list' %}"><i class="bi bi-arrow-left me-1"></i>All enquiries</a></div>
+</div>
+{% if e.notify_error %}<div class="alert alert-danger"><i class="bi bi-exclamation-octagon-fill me-2"></i><div class="flex-grow-1">The notification e-mail to the business mailbox failed: {{ e.notify_error }}</div>
+  <form method="post" action="{% url 'enquiries:resend' e.pk %}" class="ms-2">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary">Retry</button></form></div>{% endif %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card mb-4"><div class="card-header d-flex justify-content-between flex-wrap gap-1"><span>Message</span><small class="text-muted fw-normal">{{ e.submitted_at|date:"d M Y, H:i" }}</small></div>
+      <div class="p-3 enq-message">{{ e.message|linebreaks }}</div></div>
+
+    <div class="card mb-4"><div class="card-header">Reply to {{ e.name }}</div>
+      <form method="post" action="{% url 'enquiries:reply' e.pk %}" class="p-3">{% csrf_token %}
+        <div class="mb-3"><label class="form-label">To</label><input class="form-control" value="{{ e.email }}" disabled></div>
+        <div class="mb-3"><label class="form-label" for="{{ reply_form.subject.id_for_label }}">Subject</label>{{ reply_form.subject }}</div>
+        <div class="mb-3"><label class="form-label" for="{{ reply_form.body.id_for_label }}">Message</label>{{ reply_form.body }}<div class="form-text">Sent from the business mailbox; replies come back to it.</div></div>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-send me-1"></i>Send reply</button>
+      </form></div>
+
+    <div class="card"><div class="card-header">Conversation &amp; history</div>
+      {% for t in timeline %}
+      <div class="tl tl-{{ t.kind }}"><span class="dot"><i class="bi {% if t.kind == 'reply' %}bi-envelope-check{% elif t.kind == 'failed' %}bi-envelope-exclamation{% elif t.kind == 'note' %}bi-sticky{% else %}bi-clock-history{% endif %}"></i></span>
+        <div class="flex-grow-1">
+          <div class="d-flex justify-content-between flex-wrap gap-1"><b>{% if t.kind == 'reply' %}Reply sent{% elif t.kind == 'failed' %}Reply NOT delivered{% elif t.kind == 'note' %}Internal note{% else %}{{ t.text }}{% endif %} <span class="text-muted fw-normal">· {{ t.who }}</span></b><small class="text-muted">{{ t.when|date:"d M Y, H:i" }}</small></div>
+          {% if t.kind == 'event' %}{% if t.detail %}<div class="text-muted small">{{ t.detail }}</div>{% endif %}
+          {% else %}{% if t.subject %}<div class="small text-muted">To {{ t.to }} · {{ t.subject }}</div>{% endif %}<div class="tl-body">{{ t.text|linebreaksbr }}</div>
+            {% if t.error %}<div class="text-danger small mt-1">{{ t.error }}</div>{% endif %}{% endif %}
+        </div></div>
+      {% empty %}<div class="empty"><i class="bi bi-chat-dots"></i>No activity yet</div>{% endfor %}
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card mb-4"><div class="card-header">Contact</div><div class="p-3 enq-contact">
+      <div><i class="bi bi-person"></i>{{ e.name }}</div>
+      {% if e.company %}<div><i class="bi bi-building"></i>{{ e.company }}</div>{% endif %}
+      <div><i class="bi bi-envelope"></i><a href="mailto:{{ e.email }}">{{ e.email }}</a></div>
+      {% if e.phone %}<div><i class="bi bi-telephone"></i><a href="tel:{{ e.phone }}">{{ e.phone }}</a></div>{% endif %}
+      <div><i class="bi bi-tag"></i>{{ e.get_enquiry_type_display }}</div>
+    </div></div>
+    <div class="card mb-4"><div class="card-header">Manage</div><div class="p-3">
+      <form method="post" action="{% url 'enquiries:status' e.pk %}" class="mb-3">{% csrf_token %}<label class="form-label">Status</label>
+        <div class="input-group">{{ status_form.status }}<button class="btn btn-outline-primary" type="submit">Update</button></div></form>
+      <form method="post" action="{% url 'enquiries:assign' e.pk %}">{% csrf_token %}<label class="form-label">Assigned to</label>
+        <div class="input-group">{{ assign_form.assignee }}<button class="btn btn-outline-primary" type="submit">Assign</button></div></form>
+    </div></div>
+    <div class="card"><div class="card-header">Add internal note</div>
+      <form method="post" action="{% url 'enquiries:note' e.pk %}" class="p-3">{% csrf_token %}{{ note_form.body }}
+        <button class="btn btn-outline-primary mt-2" type="submit"><i class="bi bi-plus-lg me-1"></i>Add note</button></form></div>
+  </div>
+</div>
+{% endblock %}

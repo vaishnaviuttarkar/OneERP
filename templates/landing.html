@@ -1,0 +1,208 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="{% static 'img/oneerp-icon.svg' %}"><title>OneERP · Manufacturing made simple</title>
+<meta name="description" content="OneERP runs production, stock, sales and finance for manufacturers in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+
+:root{--plum:#35255c;--plum-2:#2a1d4b;--pink:#f0508f;--pink-2:#e03a7c;--lav:#b9aedb;--paper:#e8e4f0;--card:#fff;--ink:#241a3d;--muted:#756b97;--line:#d8d0ea}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6}
+a{text-decoration:none;color:inherit}
+h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:600;letter-spacing:-.02em;margin:0}
+.wrap{max-width:1140px;margin:0 auto;padding:0 1.5rem;width:100%;min-width:0}
+.hero .wrap{width:100%}
+.hero .wrap>*{min-width:0}
+.trust span{min-width:0}
+html,body{max-width:100%;overflow-x:hidden}
+.hero h1,.hero p.lead{overflow-wrap:anywhere}
+.nav{position:sticky;top:0;z-index:10;background:rgba(232,228,240,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{display:flex;align-items:center;gap:.7rem;font-family:'Fraunces',serif;font-weight:700;font-size:1.25rem;color:var(--plum)}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--pink),var(--pink-2));color:#fff;display:grid;place-items:center;font-size:1.1rem;box-shadow:0 8px 18px -6px rgba(240,80,143,.6)}
+.nav-links{display:flex;gap:.5rem;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.25rem;border-radius:999px;font-weight:600;font-size:.93rem;border:1px solid transparent;transition:transform .15s,box-shadow .15s;cursor:pointer}
+.btn:hover{transform:translateY(-1px)}
+.btn-pink{background:linear-gradient(135deg,var(--pink),var(--pink-2));color:#fff;box-shadow:0 12px 24px -10px rgba(240,80,143,.7)}
+.btn-pink:hover{color:#fff}
+a.btn-pink{color:#fff;background:linear-gradient(135deg,#f0508f,#e03a7c)}
+.nav a.btn-pink{color:#fff}
+.btn-ghost{color:var(--plum);border-color:var(--line);background:var(--card)}
+.btn-ghost:hover{border-color:var(--lav)}
+.hero{position:relative;overflow:hidden;background:radial-gradient(900px 480px at 85% -10%,rgba(240,80,143,.35),transparent 60%),radial-gradient(700px 500px at -10% 110%,rgba(185,174,219,.35),transparent 60%),linear-gradient(160deg,#3d2c66,#2b1d4d 60%,#1f1538);color:#e9e3fb;padding:5.5rem 0 6.5rem}
+.hero::after{content:"";position:absolute;inset:18px;border:1.5px dashed rgba(240,80,143,.25);border-radius:28px;pointer-events:none}
+.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:3rem;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#ff8fbb;background:rgba(240,80,143,.12);border:1px solid rgba(240,80,143,.3);padding:.4rem .9rem;border-radius:999px}
+.hero h1{font-size:3.5rem;line-height:1.05;color:#fff;margin:1.2rem 0 1rem}
+.hero h1 em{font-style:italic;color:#ff9dc2}
+.hero p.lead{font-size:1.1rem;color:#cfc6ee;max-width:520px;margin:0 0 2rem}
+.cta{display:flex;gap:.8rem;flex-wrap:wrap}
+.cta .btn-ghost{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.2)}
+.panel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:1.4rem;box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;font-size:.85rem;color:#cfc6ee}
+.dot-live{display:inline-flex;align-items:center;gap:.4rem;color:#ff9dc2;font-weight:600}.dot-live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 4px rgba(240,80,143,.25)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.kpi{background:rgba(255,255,255,.07);border-radius:16px;padding:.9rem 1rem}
+.kpi small{display:block;color:#b9aedb;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}
+.kpi b{font-family:'Fraunces',serif;font-size:1.45rem;color:#fff;font-weight:600}
+.bar{margin-top:1rem;background:rgba(255,255,255,.07);border-radius:16px;padding:1rem}
+.bar .row{display:flex;justify-content:space-between;font-size:.8rem;color:#cfc6ee;margin-bottom:.4rem}
+.track{height:8px;border-radius:8px;background:rgba(255,255,255,.1);overflow:hidden}
+.track i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,var(--pink),var(--lav))}
+section.block{padding:5.5rem 0}
+.sec-head{text-align:center;max-width:640px;margin:0 auto 3.2rem}
+.sec-head .eyebrow{background:rgba(240,80,143,.1);color:var(--pink-2);border-color:rgba(240,80,143,.25)}
+.sec-head h2{font-size:2.5rem;color:var(--plum);margin:1rem 0 .8rem}
+.sec-head p{color:var(--muted);margin:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.feat{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:1.7rem;transition:transform .2s,box-shadow .2s}
+.feat:hover{transform:translateY(-4px);box-shadow:0 24px 40px -24px rgba(53,37,92,.35)}
+.feat .ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:1.3rem;background:#fde3ee;color:var(--pink-2);margin-bottom:1.1rem}
+.feat:nth-child(3n+2) .ic{background:#ebe6f7;color:var(--plum)}
+.feat h3{font-size:1.25rem;color:var(--plum);margin-bottom:.45rem}
+.feat p{margin:0;color:var(--muted);font-size:.93rem}
+.flow{background:linear-gradient(180deg,transparent,rgba(185,174,219,.25))}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.step{background:var(--card);border-radius:20px;padding:1.5rem;border:1px solid var(--line)}
+.step .n{font-family:'Fraunces',serif;font-size:2rem;color:var(--pink);font-weight:700;line-height:1}
+.step h4{margin:.8rem 0 .35rem;font-size:1.02rem;color:var(--plum)}
+.step p{margin:0;color:var(--muted);font-size:.88rem}
+.band{background:linear-gradient(135deg,#3d2c66,#2b1d4d);color:#e9e3fb;border-radius:30px;padding:3.2rem;display:grid;grid-template-columns:1.2fr .8fr;gap:2rem;align-items:center;position:relative;overflow:hidden}
+.band::before{content:"";position:absolute;right:-80px;top:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(240,80,143,.45),transparent 70%)}
+.band h2{color:#fff;font-size:2.2rem;position:relative}
+.band p{color:#cfc6ee;position:relative;margin:.7rem 0 0}
+.band .acts{display:grid;gap:.7rem;position:relative}
+.band .acts .btn{justify-content:center;padding:.9rem 1.4rem}
+.band .btn-ghost{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.2)}
+.band small{color:#b9aedb;font-size:.8rem;text-align:center}
+footer{padding:2rem 0;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
+footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center}
+footer a{color:var(--plum);font-weight:600}
+.trust{display:flex;gap:.6rem 1.4rem;flex-wrap:wrap;margin-top:2.2rem;color:#b9aedb;font-size:.85rem}
+.trust span{display:flex;align-items:center;gap:.45rem}.trust i{color:#ff8fbb}
+.hero .wrap>*,.nav .wrap>*{min-width:0}
+.nav-links{flex-shrink:0}
+.cta .btn-ghost{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.2)}
+.btn-pink{color:#fff!important}
+@media(max-width:991.98px){.hero .wrap{grid-template-columns:1fr;gap:2.4rem}.hero h1{font-size:2.7rem}.grid{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr 1fr}.band{grid-template-columns:1fr;padding:2.2rem}}
+@media(max-width:575.98px){
+.wrap{padding:0 1.1rem}
+.nav .wrap{height:60px;gap:.5rem}
+.brand{font-size:1.05rem;gap:.5rem}.logo{width:34px;height:34px;font-size:.95rem}
+.nav-links .btn-ghost{display:none}
+.nav .btn-pink{padding:.5rem .8rem;font-size:.8rem}
+.hero{padding:3.2rem 0 3.8rem}.hero::after{inset:10px}
+.hero .wrap{grid-template-columns:minmax(0,1fr);gap:2rem;width:100%}
+.hero .wrap>div{width:100%;min-width:0}
+.hero .panel{width:100%;min-width:0}
+.bar,.kpi{min-width:0}
+.trust span{white-space:normal}
+.nav-links .btn{white-space:nowrap}
+.hero h1{font-size:2rem}.hero p.lead{font-size:1rem}
+.cta{flex-direction:column}.cta .btn{width:100%;justify-content:center}
+.trust{gap:.5rem 1rem;font-size:.8rem}
+.panel{padding:1.1rem}
+.kpis{grid-template-columns:1fr 1fr}.kpi b{font-size:1.2rem}
+.grid,.steps{grid-template-columns:1fr}
+.sec-head h2{font-size:2rem}section.block{padding:3.8rem 0}
+.band{padding:1.8rem 1.4rem;border-radius:22px}.band .acts .btn{width:100%}
+}
+
+.nav .btn-pink{padding:.6rem 1.1rem;font-size:.9rem}
+</style>
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="{% url 'landing' %}"><span class="logo"><i class="bi bi-scissors"></i></span>OneERP</a>
+  <nav class="nav-links">
+    <a class="btn btn-ghost" href="{% url 'accounts:login' %}"><i class="bi bi-box-arrow-in-right"></i>Sign in</a>
+    <a class="btn btn-pink" href="{% url 'contact:form' %}">Contact us <i class="bi bi-arrow-right"></i></a>
+  </nav>
+</div></header>
+
+<section class="hero"><div class="wrap">
+  <div>
+    <span class="eyebrow"><i class="bi bi-stars"></i>Built for manufacturers</span>
+    <h1>Run your factory with <em>clarity</em>, from cutting floor to cash.</h1>
+    <p class="lead">OneERP brings production batches, stock, sales, purchasing, payroll and finance into one calm workspace, so every order, rupee and worker stays in view.</p>
+    <div class="cta">
+      <a class="btn btn-pink" href="{% url 'contact:form' %}">Send a business enquiry <i class="bi bi-send"></i></a>
+      <a class="btn btn-ghost" href="{% url 'accounts:login' %}"><i class="bi bi-person-circle"></i>Staff sign in</a>
+    </div>
+    <div class="trust">
+      <span><i class="bi bi-check-circle-fill"></i>Batch-to-stock traceability</span>
+      <span><i class="bi bi-check-circle-fill"></i>Role-based access</span>
+      <span><i class="bi bi-check-circle-fill"></i>Built-in reconciliation</span>
+    </div>
+  </div>
+  <div class="panel" aria-hidden="true">
+    <div class="panel-head"><span>Live production</span><span class="dot-live">Running</span></div>
+    <div class="kpis">
+      <div class="kpi"><small>Active batches</small><b>6</b></div>
+      <div class="kpi"><small>Due this week</small><b>3</b></div>
+      <div class="kpi"><small>Finished goods</small><b>1,284</b></div>
+      <div class="kpi"><small>Customers owe</small><b>₹2.4L</b></div>
+    </div>
+    <div class="bar">
+      <div class="row"><span>Batch in stitching</span><b>72%</b></div>
+      <div class="track"><i style="width:72%"></i></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow"><i class="bi bi-grid"></i>Everything in one place</span>
+    <h2>One system for the whole factory</h2>
+    <p>Each module talks to the others, so a finished shirt on the floor is already a receivable, a stock movement and a payroll line.</p>
+  </div>
+  <div class="grid">
+    <div class="feat"><div class="ic"><i class="bi bi-scissors"></i></div><h3>Production batches</h3><p>Turn orders into trackable runs attach specs, assign materials and clients, then track each batch through your custom workflow stages.</p></div>
+    <div class="feat"><div class="ic"><i class="bi bi-box-seam"></i></div><h3>Stock &amp; purchasing</h3><p>Track raw materials, accessories and finished goods with an immutable movement history.</p></div>
+    <div class="feat"><div class="ic"><i class="bi bi-receipt-cutoff"></i></div><h3>Sales &amp; challans</h3><p>Dispatch with delivery challans, invoice against them, and record receipts with allocations.</p></div>
+    <div class="feat"><div class="ic"><i class="bi bi-wallet2"></i></div><h3>Weekly payroll</h3><p>Worker earnings from every operation, adjustments with approval, advances and wage payments.</p></div>
+    <div class="feat"><div class="ic"><i class="bi bi-pie-chart"></i></div><h3>Finance overview</h3><p>Stock value, what customers owe, what you owe suppliers, cash flow and where the money sits.</p></div>
+    <div class="feat"><div class="ic"><i class="bi bi-shield-check"></i></div><h3>Safe by design</h3><p>Owner, accounts and production roles, full audit trail and integrity checks on every record.</p></div>
+  </div>
+</div></section>
+
+<section class="block flow"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow"><i class="bi bi-signpost-split"></i>How it works</span>
+    <h2>From enquiry to a finished batch</h2>
+    <p>A simple path that keeps your customers, production and accounts aligned.</p>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="n">01</div><h4>Enquiry</h4><p>A school or buyer sends a requirement through the contact page.</p></div>
+    <div class="step"><div class="n">02</div><h4>Batch</h4><p>Plan sizes, fabric and the stages for that client's order.</p></div>
+    <div class="step"><div class="n">03</div><h4>Produce &amp; dispatch</h4><p>Track work entries, inspections, challans and invoices.</p></div>
+    <div class="step"><div class="n">04</div><h4>Get paid</h4><p>Receipts, supplier payments and wages settle against records.</p></div>
+  </div>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="band">
+    <div>
+      <h2>Ready to see OneERP on your floor?</h2>
+      <p>Tell us about your order volume and we will reply from our business mailbox, usually within one working day.</p>
+    </div>
+    <div class="acts">
+      <a class="btn btn-pink" href="{% url 'contact:form' %}">Send a business enquiry <i class="bi bi-arrow-right"></i></a>
+      <a class="btn btn-ghost" href="{% url 'accounts:login' %}"><i class="bi bi-box-arrow-in-right"></i>Already a user? Sign in</a>
+      <small>No account needed to enquire.</small>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <span>&copy; {% now "Y" %} OneERP · Manufacturing ERP</span>
+  <span><a href="{% url 'contact:form' %}">Contact us</a> · <a href="{% url 'accounts:login' %}">Staff sign in</a></span>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{% extends "public/base.html" %}
+{% block title %}Contact us{% endblock %}
+{% block content %}
+<div class="contact-shell">
+  <aside class="contact-info">
+    <div class="eyebrow">Get in touch</div>
+    <h1>Tell us what you need.</h1>
+    <p class="lead-text">Schools, suppliers and partners: send us a business enquiry and we will reply from our business mailbox, usually within one working day.</p>
+    <ul class="contact-list">
+      {% if business.settings.address %}<li><span class="ci"><i class="bi bi-geo-alt"></i></span><div><small>Visit us</small>{{ business.settings.address|linebreaksbr }}</div></li>{% endif %}
+      {% if business.settings.phone %}<li><span class="ci"><i class="bi bi-telephone"></i></span><div><small>Call us</small><a href="tel:{{ business.settings.phone|cut:' ' }}">{{ business.settings.phone }}</a></div></li>{% endif %}
+      {% if business.settings.email %}<li><span class="ci"><i class="bi bi-envelope"></i></span><div><small>Email us</small><a href="mailto:{{ business.settings.email }}">{{ business.settings.email }}</a></div></li>{% endif %}
+    </ul>
+    <div class="contact-note"><i class="bi bi-hash"></i><span>Every enquiry gets a reference number so we can find it quickly when we reply.</span></div>
+  </aside>
+
+  <section class="contact-form card">
+    <div class="cf-head"><h2>Send an enquiry</h2><p>Fields marked <span class="req">*</span> are required.</p></div>
+    {% if form.non_field_errors %}<div class="alert alert-danger" role="alert"><i class="bi bi-exclamation-octagon-fill me-2"></i><div>{% for e in form.non_field_errors %}{{ e }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</div></div>{% elif form.errors %}<div class="alert alert-danger" role="alert"><i class="bi bi-exclamation-octagon-fill me-2"></i>Please correct the highlighted fields and send again.</div>{% endif %}
+    <form method="post" novalidate>{% csrf_token %}{{ form.token }}
+      <div class="hp" aria-hidden="true"><label for="{{ form.website.id_for_label }}">{{ form.website.label }}</label>{{ form.website }}</div>
+      <div class="row g-3">
+        {% for f in form.visible_fields %}{% if f.name != "website" %}
+        <div class="{% if f.name == 'message' or f.name == 'subject' %}col-12{% else %}col-md-6{% endif %} cf-field{% if f.errors %} has-error{% endif %}">
+          <label class="form-label" for="{{ f.id_for_label }}">{{ f.label }}{% if f.field.required %} <span class="req">*</span>{% endif %}</label>
+          {{ f }}
+          {% for e in f.errors %}<div class="field-error"><i class="bi bi-exclamation-circle"></i> {{ e }}</div>{% endfor %}
+        </div>{% endif %}{% endfor %}
+      </div>
+      <div class="cf-actions">
+        <button type="submit" class="btn btn-primary btn-lg">Send enquiry <i class="bi bi-send ms-1"></i></button>
+        <small><i class="bi bi-shield-lock"></i> We only use your details to reply to this enquiry.</small>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}

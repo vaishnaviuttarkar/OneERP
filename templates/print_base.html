@@ -1,0 +1,10 @@
+<!doctype html><html><head><meta charset="utf-8"><title>{{ title }}</title>
+<style>body{font-family:Arial,sans-serif;font-size:13px;margin:30px;color:#111}h2,h3{margin:0}table{width:100%;border-collapse:collapse;margin-top:14px}
+th,td{border:1px solid #999;padding:5px 7px;text-align:left}th{background:#eee}.r{text-align:right}.hdr{display:flex;justify-content:space-between;border-bottom:2px solid #000;padding-bottom:8px}
+.sig{margin-top:60px;display:flex;justify-content:space-between}@media print{.noprint{display:none}}</style></head>
+<body><div class="noprint"><button onclick="window.print()">Print</button></div>
+<div class="hdr"><div><h2>{{ business.name }}</h2>{{ business.settings.address|linebreaksbr }}<br>{{ business.settings.phone }} {% if business.settings.tax_id %}· ID: {{ business.settings.tax_id }}{% endif %}</div>
+<div style="text-align:right"><h3>{{ title }}</h3>{% block meta %}{% endblock %}</div></div>
+{% block body %}{% endblock %}
+<div class="sig"><div>Receiver's signature</div><div>Authorised signatory</div></div>
+</body></html>

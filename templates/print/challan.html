@@ -1,0 +1,5 @@
+{% extends "print_base.html" %}
+{% block meta %}<div>{{ c.number }}</div><div>Date: {{ c.challan_date }}</div>{% if c.status == "cancelled" %}<b>CANCELLED</b>{% endif %}{% endblock %}
+{% block body %}<p><b>Deliver to:</b> {{ c.customer.name }}<br>{{ c.customer.address|linebreaksbr }}{% if c.vehicle_no %}<br>Vehicle: {{ c.vehicle_no }}{% endif %}</p>
+<table><tr><th>#</th><th>Item</th><th class="r">Qty (pcs)</th></tr>
+{% for l in lines %}<tr><td>{{ forloop.counter }}</td><td>{{ l.variant.label }}</td><td class="r">{{ l.quantity }}</td></tr>{% endfor %}</table>{% endblock %}

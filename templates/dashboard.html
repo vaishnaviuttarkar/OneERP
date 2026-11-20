@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="hero">
+  <div><div class="eyebrow">{% now "l, j F" %}</div><h3>{{ greeting }}, {{ name }}.</h3><p>Production at {{ business.name }} right now: batches, stages and clients.</p></div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a class="btn primary" href="/production/batches/new/"><i class="bi bi-plus-circle me-1"></i>New batch</a>
+    <a class="btn" href="/production/entries/new/"><i class="bi bi-clipboard2-plus me-1"></i>Work entry</a>
+    <a class="btn" href="{% url 'finance:overview' %}"><i class="bi bi-pie-chart me-1"></i>Finance overview</a>
+  </div>
+</div>
+
+{% include "partials/production_insights.html" %}
+
+<div class="row g-3">
+  <div class="col-lg-5"><div class="card h-100"><div class="card-header">Stock on the floor</div>
+    <div class="acct"><div class="nm">Finished goods in stock<small>ready to dispatch</small></div><div class="amt">{{ d.fg_stock|floatformat:"-3" }} pcs</div></div>
+    <div class="acct"><div class="nm">Pending production<small>planned minus completed and rejected</small></div><div class="amt">{{ d.pending_production|floatformat:"-3" }} pcs</div></div>
+    <div class="acct"><div class="nm">Batches due this week<small>active, due in the next 7 days</small></div><div class="amt">{{ d.due_week }}</div></div>
+    <div class="acct"><div class="nm">Money, dues &amp; cash flow<small>see the Finance overview</small></div><a class="btn btn-sm btn-outline-secondary" href="{% url 'finance:overview' %}">Open <i class="bi bi-arrow-right"></i></a></div>
+  </div></div>
+  <div class="col-lg-7"><div class="card h-100"><div class="card-header">Recent business activity</div>
+    {% for e in d.recent %}<div class="activity"><span class="dot"><i class="bi bi-lightning-charge"></i></span>
+      <div class="flex-grow-1"><div class="fw-semibold">{{ e.action }}</div><small>{{ e.entity }} #{{ e.entity_id }} · {{ e.user.username }}</small></div><small>{{ e.created_at|date:"d M, H:i" }}</small></div>
+    {% empty %}<div class="empty"><i class="bi bi-activity"></i>No activity yet</div>{% endfor %}</div></div>
+</div>
+{{ chart|json_script:"chart-data" }}
+{% endblock %}
+{% block scripts %}{% include "partials/production_charts.html" %}{% endblock %}

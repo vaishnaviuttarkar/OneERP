@@ -1,0 +1,96 @@
+{% extends "base.html" %}{% block title %}Finance overview{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h3>Finance overview</h3><div class="sub">Stock value, what customers and suppliers owe, wages, cash flow and where the money sits</div></div>
+  <div class="head-actions">
+    <a class="btn btn-outline-primary" href="{% url 'finance:receipts' %}"><i class="bi bi-cash-coin me-1"></i>Receipts</a>
+    <a class="btn btn-outline-primary" href="{% url 'finance:expenses' %}"><i class="bi bi-credit-card-2-front me-1"></i>Expenses</a>
+    <a class="btn btn-outline-secondary" href="{% url 'reports:report' 'cash-flow' %}"><i class="bi bi-file-earmark-bar-graph me-1"></i>Cash flow report</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3"><div class="card stat dark"><div class="ico"><i class="bi bi-box-seam"></i></div><div class="label">Total stock value</div><div class="value">₹{{ f.stock_value|floatformat:2 }}</div><div class="hint">raw materials, accessories and finished goods at cost</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat t-emerald"><div class="ico"><i class="bi bi-arrow-down-left"></i></div><div class="label">Customer outstanding</div><div class="value">₹{{ f.receivable|floatformat:2 }}</div><div class="hint">{{ f.open_invoices }} open invoice{{ f.open_invoices|pluralize }}{% if f.overdue_invoices %} · <span class="text-danger">{{ f.overdue_invoices }} over 30 days</span>{% endif %}</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat t-rose"><div class="ico"><i class="bi bi-arrow-up-right"></i></div><div class="label">Supplier outstanding</div><div class="value">₹{{ f.payable|floatformat:2 }}</div><div class="hint">{{ f.open_bills }} unpaid purchase bill{{ f.open_bills|pluralize }}</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat t-amber"><div class="ico"><i class="bi bi-wallet2"></i></div><div class="label">Weekly wages payable</div><div class="value">₹{{ f.wages_payable|floatformat:2 }}</div><div class="hint">{{ f.unpaid_wage_count }} finalized statement{{ f.unpaid_wage_count|pluralize }} unpaid</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat dark"><div class="ico"><i class="bi bi-bank"></i></div><div class="label">Cash / bank position</div><div class="value">₹{{ f.cash_position|floatformat:2 }}</div><div class="hint">across {{ f.accounts|length }} account{{ f.accounts|length|pluralize }}</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat t-violet"><div class="ico"><i class="bi bi-graph-up-arrow"></i></div><div class="label">Net working position</div><div class="value">₹{{ f.net_working|floatformat:2 }}</div><div class="hint">cash + receivable + stock − payables − wages</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat t-sky"><div class="ico"><i class="bi bi-receipt-cutoff"></i></div><div class="label">Sales this month</div><div class="value">₹{{ f.sales_month|floatformat:2 }}</div><div class="hint">posted invoices this month</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat t-rose"><div class="ico"><i class="bi bi-credit-card-2-front"></i></div><div class="label">Expenses this month</div><div class="value">₹{{ f.expenses_month|floatformat:2 }}</div><div class="hint">net cash {% if f.net_month >= 0 %}in{% else %}out{% endif %} ₹{{ f.net_month|floatformat:2 }} this month</div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-lg-8"><div class="card chart-dark h-100"><div class="card-header d-flex justify-content-between align-items-center"><span>Cash flow · last 14 days</span><a class="btn btn-sm btn-outline-secondary" href="{% url 'reports:report' 'cash-flow' %}">Full report</a></div><div class="p-3"><div class="chart-box"><canvas id="cashChart"></canvas></div></div></div></div>
+  <div class="col-lg-4"><div class="card h-100"><div class="card-header">Where the money is</div><div class="p-3 d-flex justify-content-center"><div class="chart-box sm"><canvas id="mixChart"></canvas></div></div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-lg-6"><div class="card h-100"><div class="card-header">Monthly cash in vs out <small class="text-muted fw-normal">· last 6 months</small></div>
+    <div class="p-3"><div class="chart-box"><canvas id="monthlyChart"></canvas></div></div></div></div>
+  <div class="col-lg-6"><div class="card h-100"><div class="card-header">Expenses by category <small class="text-muted fw-normal">· last 90 days</small></div>
+    <div class="p-3 d-flex justify-content-center">{% if chart.expenses.labels %}<div class="chart-box sm"><canvas id="expenseChart"></canvas></div>{% else %}<div class="empty py-4"><i class="bi bi-credit-card"></i>No expenses in the last 90 days</div>{% endif %}</div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-lg-4"><div class="card h-100"><div class="card-header">Customer receivables ageing</div>
+    {% for label, amt in f.rec_ageing.items %}<div class="ageing-row"><span class="fw-semibold small" style="min-width:92px">{{ label }}</span>
+      <div class="ageing-bar"><i style="width:{% if f.receivable %}{% widthratio amt f.receivable 100 %}{% else %}0{% endif %}%"></i></div><span class="small">₹{{ amt|floatformat:2 }}</span></div>{% endfor %}</div></div>
+  <div class="col-lg-4"><div class="card h-100"><div class="card-header">Supplier payables ageing</div>
+    {% for label, amt in f.pay_ageing.items %}<div class="ageing-row"><span class="fw-semibold small" style="min-width:92px">{{ label }}</span>
+      <div class="ageing-bar"><i style="width:{% if f.payable %}{% widthratio amt f.payable 100 %}{% else %}0{% endif %}%"></i></div><span class="small">₹{{ amt|floatformat:2 }}</span></div>{% endfor %}</div></div>
+  <div class="col-lg-4"><div class="card h-100"><div class="card-header">Cash &amp; bank accounts</div>
+    {% for r in f.accounts %}<div class="acct"><div class="nm">{{ r.account.name }}<small>{{ r.account.get_kind_display }} · in ₹{{ r.in|floatformat:0 }} · out ₹{{ r.out|floatformat:0 }}</small></div><div class="amt">₹{{ r.balance|floatformat:2 }}</div></div>
+    {% empty %}<div class="empty"><i class="bi bi-bank"></i>No accounts yet</div>{% endfor %}</div></div>
+</div>
+
+<div class="row g-3 mb-3 fin-list">
+  <div class="col-lg-4"><div class="card h-100"><div class="card-header">Clientele Outstanding Amount</div>
+    {% for name, amt in f.top_debtors %}<div class="acct"><div class="nm">{{ name }}</div><div class="amt">₹{{ amt|floatformat:2 }}</div></div>
+    {% empty %}<div class="empty"><i class="bi bi-emoji-smile"></i>Nobody owes you anything</div>{% endfor %}</div></div>
+  <div class="col-lg-4"><div class="card h-100"><div class="card-header">Suppliers Outstanding Amount</div>
+    {% for name, amt in f.top_creditors %}<div class="acct"><div class="nm">{{ name }}</div><div class="amt">₹{{ amt|floatformat:2 }}</div></div>
+    {% empty %}<div class="empty"><i class="bi bi-emoji-smile"></i>No supplier dues</div>{% endfor %}</div></div>
+  <div class="col-lg-4"><div class="card h-100"><div class="card-header d-flex justify-content-between"><span>Wages awaiting payment</span><a class="small" href="{% url 'payroll:statements' %}">All statements</a></div>
+    {% for s in f.unpaid_wages %}<div class="acct"><div class="nm">{{ s.worker.name }}<small>{{ s.period_start }} → {{ s.period_end }} · {% if s.paid_amount %}partly paid{% else %}unpaid{% endif %}</small></div><div class="amt">₹{{ s.outstanding|floatformat:2 }}</div></div>
+    {% empty %}<div class="empty"><i class="bi bi-check2-circle"></i>No wages outstanding</div>{% endfor %}</div></div>
+</div>
+{{ chart|json_script:"chart-data" }}
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+  if(!window.Chart) return;
+  const data = JSON.parse(document.getElementById('chart-data').textContent);
+  const inr = v => '₹' + Number(v).toLocaleString('en-IN', {maximumFractionDigits: 2});
+  const palette = ['#3f2d6b','#f0508f','#8f74d9','#f4a6c6','#b9aedb','#e03a7c','#5b4a8a'];
+  let charts = [];
+  function draw(){
+    const s = getComputedStyle(document.documentElement), ink = s.getPropertyValue('--muted').trim(), card = s.getPropertyValue('--card').trim();
+    charts.forEach(c => c.destroy()); charts = [];
+    Chart.defaults.font.family = "'Inter',sans-serif"; Chart.defaults.color = ink;
+    const el = id => document.getElementById(id);
+    const barOpts = {maintainAspectRatio:false, interaction:{mode:'index', intersect:false},
+      plugins:{legend:{position:'top', align:'end', labels:{usePointStyle:true, boxWidth:8}}, tooltip:{callbacks:{label:x => x.dataset.label + ': ' + inr(x.parsed.y)}}},
+      scales:{y:{beginAtZero:true, grid:{color:'rgba(127,127,160,.15)'}, border:{display:false}, ticks:{callback:v => inr(v)}}, x:{grid:{display:false}}}};
+    charts.push(new Chart(el('cashChart'), {type:'bar', data:{labels:data.cash.labels, datasets:[
+      {label:'Cash in', data:data.cash.ins, backgroundColor:'#f0508f', borderRadius:8, maxBarThickness:16},
+      {label:'Cash out', data:data.cash.outs, backgroundColor:'#b9aedb', borderRadius:8, maxBarThickness:16}]},
+      options: Object.assign({responsive:true}, barOpts)}));
+    charts.push(new Chart(el('mixChart'), {type:'doughnut', data:{labels:data.mix.labels, datasets:[{data:data.mix.values,
+      backgroundColor:['#3f2d6b','#f0508f','#8f74d9','#f4a6c6'], borderColor:card, borderWidth:3, hoverOffset:6}]},
+      options:{maintainAspectRatio:false, cutout:'68%', plugins:{legend:{position:'bottom', labels:{usePointStyle:true, boxWidth:8, padding:14}},
+        tooltip:{callbacks:{label:x => ' ' + x.label + ': ' + inr(x.parsed)}}}}}));
+    charts.push(new Chart(el('monthlyChart'), {type:'bar', data:{labels:data.monthly.labels, datasets:[
+      {label:'Cash in', data:data.monthly.ins, backgroundColor:'#f0508f', borderRadius:8, maxBarThickness:28},
+      {label:'Cash out', data:data.monthly.outs, backgroundColor:'#b9aedb', borderRadius:8, maxBarThickness:28}]}, options: barOpts}));
+    if (el('expenseChart')) charts.push(new Chart(el('expenseChart'), {type:'pie', data:{labels:data.expenses.labels, datasets:[{data:data.expenses.values,
+      backgroundColor:palette, borderColor:card, borderWidth:3}]}, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{usePointStyle:true, boxWidth:8}},
+        tooltip:{callbacks:{label:x => ' ' + x.label + ': ' + inr(x.parsed)}}}}}));
+  }
+  draw(); window.addEventListener('themechange', draw);
+})();
+</script>
+{% endblock %}
+

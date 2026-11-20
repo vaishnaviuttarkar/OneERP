@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block title %}Production dashboard{% endblock %}
+{% block content %}
+<div class="hero"><div><div class="eyebrow">{% now "l, j F" %}</div><h3>{{ greeting }}, {{ name }}.</h3><p>Batches, output and pending work on the floor.</p></div>
+  <div class="d-flex gap-2 flex-wrap"><a class="btn primary" href="/production/entries/new/"><i class="bi bi-clipboard2-plus me-1"></i>Work entry</a><a class="btn" href="/production/issue/"><i class="bi bi-box-arrow-right me-1"></i>Issue material</a><a class="btn" href="/production/batches/new/"><i class="bi bi-plus-circle me-1"></i>New batch</a></div></div>
+{% include "partials/production_insights.html" %}
+<div class="card"><div class="card-header">Recent production activity</div>
+{% for e in d.recent %}<div class="activity"><span class="dot"><i class="bi bi-lightning-charge"></i></span><div class="flex-grow-1"><div class="fw-semibold">{{ e.action }}</div><small>{{ e.entity }} #{{ e.entity_id }}</small></div><small>{{ e.created_at|date:"d M, H:i" }}</small></div>
+{% empty %}<div class="empty"><i class="bi bi-activity"></i>No activity yet</div>{% endfor %}</div>
+{{ chart|json_script:"chart-data" }}
+{% endblock %}
+{% block scripts %}{% include "partials/production_charts.html" %}{% endblock %}

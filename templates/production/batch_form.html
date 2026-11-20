@@ -1,0 +1,80 @@
+{% extends "form.html" %}{% load erp_extras %}
+{# Batch create / edit: the standard form + size-wise plan, then the workflow-stage checklist. #}
+{% block form_class %}batch-form{% endblock %}
+{% block after_formsets %}
+<datalist id="fabric-types">{% for f in fabric_suggestions %}<option value="{{ f }}">{% endfor %}</datalist>
+{% with field=form.stages %}
+<div class="wf-check mt-4" id="wf-check" data-defaults="{{ product_defaults_json }}">
+  <div class="wf-head">
+    <div><h6 class="mb-1 fw-bold">Workflow stages</h6>
+      <div class="form-text mt-0">Tick every stage this client's order goes through. Stages run in the order shown;
+        the product's default workflow is pre-selected.{% if stages_locked %} <b>Production has started, so the route is locked.</b>{% endif %}</div></div>
+    {% if not stages_locked %}<div class="wf-tools">
+      <button type="button" class="btn btn-sm btn-outline-secondary" data-wf="defaults"><i class="bi bi-arrow-counterclockwise me-1"></i>Product default</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" data-wf="all">Select all</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" data-wf="none">Clear</button>
+    </div>{% endif %}
+  </div>
+  <div class="wf-grid">
+    {% for cb in field %}
+    <label class="wf-item" for="{{ cb.id_for_label }}">
+      <input type="checkbox" name="{{ cb.data.name }}" value="{{ cb.data.value }}" id="{{ cb.id_for_label }}" class="form-check-input"
+             {% if cb.data.selected %}checked{% endif %}{% if stages_locked %} disabled{% endif %}>
+      <span class="wf-num"></span>
+      <span class="wf-text"><b>{{ cb.choice_label }}</b><small>{{ stage_meta|get_item:cb.data.value }}</small></span>
+    </label>
+    {% endfor %}
+  </div>
+  {% for e in field.errors %}<div class="text-danger small mt-2"><i class="bi bi-exclamation-circle"></i> {{ e }}</div>{% endfor %}
+  <div class="wf-preview" aria-live="polite"><span class="text-muted small">Route:</span> <span id="wf-route"></span></div>
+</div>
+{% endwith %}
+{% endblock %}
+{% block form_scripts %}
+<script>
+(function () {
+  var box = document.getElementById('wf-check'); if (!box) return;
+  var defaults = JSON.parse(box.getAttribute('data-defaults') || '{}');
+  var boxes = Array.prototype.slice.call(box.querySelectorAll('input[type=checkbox]'));
+  var product = document.getElementById('id_product');
+  function paint() {
+    var n = 0, names = [];
+    boxes.forEach(function (b) {
+      var item = b.closest('.wf-item');
+      item.classList.toggle('on', b.checked);
+      item.querySelector('.wf-num').textContent = b.checked ? ++n : '';
+      if (b.checked) names.push(item.querySelector('b').textContent);
+    });
+    document.getElementById('wf-route').textContent = names.length ? names.join('  →  ') : 'no stages selected';
+  }
+  function applyDefaults() {
+    var ids = (product && defaults[product.value]) || [];
+    if (!ids.length) return;
+    boxes.forEach(function (b) { b.checked = ids.indexOf(parseInt(b.value, 10)) > -1; });
+    paint();
+  }
+  box.addEventListener('change', paint);
+  box.querySelectorAll('[data-wf]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var mode = btn.getAttribute('data-wf');
+      if (mode === 'defaults') return applyDefaults();
+      boxes.forEach(function (b) { b.checked = mode === 'all'; }); paint();
+    });
+  });
+  // picking a product pre-ticks its default workflow and limits the size dropdowns to that product
+  if (product) product.addEventListener('change', function () {
+    applyDefaults();
+    var label = product.options[product.selectedIndex] ? product.options[product.selectedIndex].text : '';
+    document.querySelectorAll('select[name$="-variant"]').forEach(function (sel) {
+      Array.prototype.forEach.call(sel.options, function (o) {
+        if (!o.value) return;
+        o.hidden = !!product.value && o.text.indexOf(label + ' - ') !== 0 && o.text.indexOf(label + ' [') !== 0;
+      });
+      if (sel.selectedOptions[0] && sel.selectedOptions[0].hidden) sel.value = '';
+    });
+  });
+  if (product && product.value && !boxes.some(function (b) { return b.checked; })) applyDefaults();
+  paint();
+})();
+</script>
+{% endblock %}

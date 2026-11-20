@@ -1,0 +1,30 @@
+{# Shared production insights block (quantities only - safe for the Production role). Expects d (with d.ins) and chart. #}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3"><div class="card stat t-violet"><div class="ico"><i class="bi bi-gear-wide-connected"></i></div><div class="label">Active batches</div><div class="value">{{ d.active_batches }}</div><div class="hint">{{ d.ins.counts.planned }} planned · {{ d.ins.counts.in_progress }} in progress</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat t-amber"><div class="ico"><i class="bi bi-hourglass-split"></i></div><div class="label">Pending production (pcs)</div><div class="value">{{ d.pending_production|floatformat:"-3" }}</div><div class="hint">{{ d.due_week }} batch{{ d.due_week|pluralize:"es" }} due in 7 days</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat t-rose"><div class="ico"><i class="bi bi-alarm"></i></div><div class="label">Delayed batches</div><div class="value">{{ d.delayed }}</div><div class="hint">past their expected completion</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat t-emerald"><div class="ico"><i class="bi bi-check2-circle"></i></div><div class="label">Completed · 30 days</div><div class="value">{{ d.completed_30 }}</div><div class="hint">{% if d.on_time_pct is not None %}{{ d.on_time_pct }}% delivered on time{% else %}no due dates yet{% endif %}</div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-lg-4"><div class="card h-100"><div class="card-header">Batches by status</div>
+    <div class="p-3 d-flex justify-content-center"><div class="chart-box sm"><canvas id="statusChart"></canvas></div></div></div></div>
+  <div class="col-lg-4"><div class="card h-100"><div class="card-header">Active batches by current stage</div>
+    <div class="p-3">{% if chart.stages.labels %}<div class="chart-box sm"><canvas id="stageChart"></canvas></div>{% else %}<div class="empty py-4"><i class="bi bi-diagram-3"></i>No active batches</div>{% endif %}</div></div></div>
+  <div class="col-lg-4"><div class="card h-100"><div class="card-header">Planned pieces by client (active)</div>
+    <div class="p-3 d-flex justify-content-center">{% if chart.clients.labels %}<div class="chart-box sm"><canvas id="clientChart"></canvas></div>{% else %}<div class="empty py-4"><i class="bi bi-people"></i>No active batches</div>{% endif %}</div></div></div>
+</div>
+
+<div class="card mb-3"><div class="card-header d-flex justify-content-between align-items-center"><span>Active batch tracker</span>
+  <a class="btn btn-sm btn-outline-secondary" href="{% url 'production:batches' %}?status=in_progress">All batches</a></div>
+  {% for c in d.ins.cards %}
+  <a class="batch-row" href="{% url 'production:batch_detail' c.batch.pk %}">
+    <div class="br-id"><b>{{ c.batch.number }}</b><small>{{ c.batch.product.name }}</small></div>
+    <div class="br-client"><i class="bi bi-building"></i>{{ c.batch.client.name|default:"No client" }}</div>
+    <div class="br-stage"><small>Current stage</small>{{ c.s.current_stage }}</div>
+    <div class="br-progress"><div class="d-flex justify-content-between small"><span>{{ c.s.completed|floatformat:"-3" }} / {{ c.s.planned|floatformat:"-3" }} pcs</span><b>{{ c.s.progress }}%</b></div>
+      <div class="progress-thin"><i style="width:{{ c.s.progress }}%"></i></div></div>
+    <div class="br-due">{% if c.s.delayed %}<span class="badge text-bg-danger">Delayed {{ c.days_left|stringformat:"d"|slice:"1:" }}d</span>{% elif c.days_left is not None %}<span class="badge {% if c.days_left <= 3 %}text-bg-warning{% else %}text-bg-secondary{% endif %}">{% if c.days_left == 0 %}Due today{% else %}Due in {{ c.days_left }}d{% endif %}</span>{% else %}<span class="badge text-bg-secondary">No due date</span>{% endif %}</div>
+  </a>
+  {% empty %}<div class="empty"><i class="bi bi-scissors"></i>No active batches. <a href="{% url 'production:batch_create' %}">Start a new batch</a></div>{% endfor %}
+</div>

@@ -1,0 +1,12 @@
+{% extends "print_base.html" %}
+{% block meta %}<div>{{ st.number|default:"DRAFT" }}</div><div>{{ st.period_start }} to {{ st.period_end }}</div>{% endblock %}
+{% block body %}
+<p><b>Worker:</b> {{ st.worker.name }} ({{ st.worker.code }})</p>
+<table><tr><th>Date</th><th>Operation</th><th class="r">Paid qty</th><th class="r">Rate</th><th class="r">Amount</th></tr>
+{% for l in lines %}<tr><td>{{ l.work_entry.work_date }}</td><td>{{ l.work_entry.op_name }}</td><td class="r">{{ l.work_entry.paid_qty|floatformat:"-3" }}</td><td class="r">{{ l.work_entry.rate }}</td><td class="r">{{ l.amount }}</td></tr>{% endfor %}
+<tr><td colspan="4" class="r"><b>Gross earnings</b></td><td class="r">{{ st.gross_earnings }}</td></tr>
+{% for a in adjustments %}<tr><td colspan="4" class="r">{{ a.get_kind_display }}: {{ a.reason }}</td><td class="r">{% if a.kind == "deduction" %}-{% endif %}{{ a.amount }}</td></tr>{% endfor %}
+<tr><td colspan="4" class="r">Advance recovery</td><td class="r">-{{ st.advance_recovery }}</td></tr>
+<tr><td colspan="4" class="r"><b>Net payable</b></td><td class="r"><b>{{ st.net_payable }}</b></td></tr>
+<tr><td colspan="4" class="r">Paid</td><td class="r">{{ st.paid_amount }}</td></tr></table>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load erp_extras %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h3>{{ title }}</h3>{% if subtitle %}<div class="sub">{{ subtitle }}</div>{% endif %}</div>
+  <div class="head-actions">{% for label, url in extra_actions %}<a class="btn btn-outline-primary" href="{{ url }}">{{ label }}</a>{% endfor %}
+  {% if add_url %}<a class="btn btn-primary" href="{{ add_url }}"><i class="bi bi-plus-lg me-1"></i>{{ add_label }}</a>{% endif %}</div>
+</div>
+{% if search or filters %}
+{# Filters apply instantly (HTMX on change / typing). hx-get uses the page path only: the form carries every parameter, so nothing is #}
+{# duplicated and ?page= is dropped. The Reset slot is refreshed out-of-band on every swap, so it appears exactly while something is filtered. #}
+<form class="toolbar" method="get" action="{{ request.path }}" hx-get="{{ request.path }}" hx-trigger="keyup changed delay:350ms from:#q, change, submit"
+      hx-target="#results" hx-select="#results" hx-select-oob="#reset-slot" hx-swap="outerHTML" hx-push-url="true" hx-indicator="#spin" hx-sync="this:replace">
+  {% if search %}<div class="search"><i class="bi bi-search"></i><input id="q" name="q" value="{{ q }}" class="form-control" placeholder="Search…" autocomplete="off" aria-label="Search"></div>{% endif %}
+  {% for f in filters %}<label class="filter-chip{% if f.current %} on{% endif %}"><span class="fc-label">{{ f.label }}</span><select name="{{ f.name }}" class="form-select filter-select" aria-label="{{ f.label }}"><option value="">All</option>{% for v, l in f.options %}<option value="{{ v }}" {% if f.current|stringformat:"s" == v|stringformat:"s" %}selected{% endif %}>{{ l }}</option>{% endfor %}</select></label>{% endfor %}
+  {% if sort_idx is not None %}<input type="hidden" name="sort" value="{{ sort_idx }}"><input type="hidden" name="dir" value="{{ sort_dir }}">{% endif %}
+  <noscript><button class="btn btn-outline-secondary" type="submit"><i class="bi bi-funnel"></i> Filter</button></noscript>
+  <span id="reset-slot">{% if has_active %}<a class="btn btn-reset" href="{{ request.path }}{% if sort_idx is not None %}?sort={{ sort_idx }}&dir={{ sort_dir }}{% endif %}" title="Clear search and filters"><i class="bi bi-x-circle"></i><span>Reset</span></a>{% endif %}</span>
+  <span id="spin" class="htmx-indicator spinner-border spinner-border-sm text-primary"></span>
+</form>
+{% endif %}
+<div id="results" class="card"><div class="table-responsive">
+<table class="table table-hover align-middle stack">
+<thead><tr>{% for h in heads %}<th>{% if h.sortable %}<a class="sort {% if h.active %}active{% endif %}" href="?{{ h.qs }}" hx-boost="false">{{ h.label }}{% if h.active %} <i class="bi bi-caret-{% if h.dir == 'desc' %}down{% else %}up{% endif %}-fill"></i>{% endif %}</a>{% else %}{{ h.label }}{% endif %}</th>{% endfor %}</tr></thead>
+<tbody>
+{% for row in page %}<tr>{% for label, cell in row|with_labels:headers %}<td data-label="{{ label }}">{{ cell }}</td>{% endfor %}</tr>
+{% empty %}<tr><td class="nostack" colspan="{{ headers|length }}"><div class="empty"><i class="bi bi-inbox"></i>{{ empty }}</div></td></tr>{% endfor %}
+</tbody></table></div>
+{% if page.paginator.num_pages > 1 %}<div class="pager">
+<span class="text-muted small">Page {{ page.number }} of {{ page.paginator.num_pages }} · {{ page.paginator.count }} rows</span>
+<div class="d-flex gap-2">{% if page.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?{% if qs %}{{ qs }}&{% endif %}page={{ page.previous_page_number }}"><i class="bi bi-chevron-left"></i> Previous</a>{% endif %}
+{% if page.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?{% if qs %}{{ qs }}&{% endif %}page={{ page.next_page_number }}">Next <i class="bi bi-chevron-right"></i></a>{% endif %}</div></div>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "print_base.html" %}
+{% block meta %}<div>{{ i.number }}</div><div>Date: {{ i.invoice_date }}</div>{% if i.status == "cancelled" %}<b>CANCELLED</b>{% endif %}{% endblock %}
+{% block body %}<p><b>Bill to:</b> {{ i.customer.name }}<br>{{ i.customer.address|linebreaksbr }}</p>
+<table><tr><th>#</th><th>Item</th><th class="r">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr>
+{% for l in lines %}<tr><td>{{ forloop.counter }}</td><td>{{ l.variant.label }}</td><td class="r">{{ l.quantity }}</td><td class="r">{{ l.rate }}</td><td class="r">{{ l.amount }}</td></tr>{% endfor %}
+<tr><td colspan="4" class="r">Subtotal</td><td class="r">{{ i.subtotal }}</td></tr>
+<tr><td colspan="4" class="r">Round off</td><td class="r">{{ i.round_off }}</td></tr>
+<tr><td colspan="4" class="r"><b>Total (₹)</b></td><td class="r"><b>{{ i.total }}</b></td></tr></table>
+<p>{{ business.settings.invoice_footer|linebreaksbr }}</p>{% endblock %}
