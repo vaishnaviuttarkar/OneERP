@@ -39,9 +39,9 @@ The following are placeholders. The project owner will replace them with active 
 
 | Account | Role | Username | Password |
 |---|---|---|---|
-| Owner | Full access | `REPLACE_WITH_OWNER_USERNAME` | `REPLACE_WITH_OWNER_PASSWORD` |
-| Accounts / Billing | Finance, purchasing, sales and related operations | `REPLACE_WITH_ACCOUNTS_USERNAME` | `REPLACE_WITH_ACCOUNTS_PASSWORD` |
-| Production | Production and stock-quantity workflows | `REPLACE_WITH_PRODUCTION_USERNAME` | `REPLACE_WITH_PRODUCTION_PASSWORD` |
+| Owner | Full access | `owner` | `Demo@12345` |
+| Accounts / Billing | Finance, purchasing, sales and related operations | `accounts` | `Demo@12345` |
+| Production | Production and stock-quantity workflows | `production` | `Demo@12345` |
 
 Use the **Owner** account first for the broadest walkthrough. Then sign out and use the Accounts and Production accounts to verify role-based restrictions.
 
